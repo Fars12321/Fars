@@ -14,3 +14,5 @@
 
 ## Railway
 Railway يبني المشروع باستخدام Godot headless ثم يصدر نسخة Web ويقدمها عبر nginx. Railway ليس سطح مكتب Godot تفاعليًا؛ المحرك يعمل داخل مرحلة البناء والتصدير.
+
+Build target: Godot 4.7.2 / Web / Compatibility / single-threaded.
