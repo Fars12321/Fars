@@ -12,8 +12,10 @@ func _run() -> void:
     var root:Node = packed.instantiate()
     root.process_mode = Node.PROCESS_MODE_ALWAYS
     get_root().add_child(root)
-    for i in range(360):
-        await process_frame
+    # Headless CI does not need real rendering frames. Advance the simulation directly
+    # so the smoke test is deterministic and cannot stall waiting for a display frame.
+    for i in range(8):
+        root.call("_simulate", 1.0)
     var kingdoms:Array = root.get("kingdoms")
     var people:Array = root.get("people")
     var buildings:Array = root.get("buildings")
