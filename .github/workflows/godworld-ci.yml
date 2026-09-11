@@ -1,0 +1,32 @@
+name: GodWorld Godot CI
+on:
+  push:
+    branches: [main, godworld-v15-auto]
+    paths:
+      - 'godworld/**'
+  pull_request:
+    paths:
+      - 'godworld/**'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.7.2
+    defaults:
+      run:
+        working-directory: godworld
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Import and parse project
+        run: godot --headless --path . --editor --quit
+      - name: Run the real game headless
+        shell: bash
+        run: |
+          set -o pipefail
+          godot --headless --path . --quit-after 180 2>&1 | tee /tmp/godworld-runtime.log
+          if grep -Eiq 'SCRIPT ERROR|Parse Error|ERROR:' /tmp/godworld-runtime.log; then
+            echo 'GodWorld runtime reported an error.'
+            exit 1
+          fi
+          echo 'GodWorld runtime smoke completed without reported engine/script errors.'
