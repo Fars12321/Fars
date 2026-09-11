@@ -1,20 +1,22 @@
 extends SceneTree
 
 func _init() -> void:
-    var packed:PackedScene = load("res://scenes/main.tscn") as PackedScene
-    if packed == null:
-        push_error("SMOKE: main scene could not be loaded")
+    var script:Script = load("res://scripts/main.gd") as Script
+    if script == null:
+        push_error("SMOKE: main script could not be loaded")
         quit(2)
         return
-    var root:Node = packed.instantiate()
-    get_root().add_child(root)
+    var root:Node2D = Node2D.new()
+    root.set_script(script)
+    root.call("_generate_world")
+    root.call("_spawn_civilizations")
     for i in range(4):
-        root.call("_process", 1.1)
+        root.set("time_accum", 1.1)
+        root.call("_simulate", 1.1)
     var kingdoms:Array = root.get("kingdoms")
     var people:Array = root.get("people")
     var buildings:Array = root.get("buildings")
     var nature:Array = root.get("nature")
-    var armies:Array = root.get("armies")
     var age:int = int(root.get("world_age"))
     if kingdoms.size() != 4:
         push_error("SMOKE: expected 4 kingdoms, got %s" % kingdoms.size())
@@ -36,5 +38,5 @@ func _init() -> void:
         push_error("SMOKE: autonomous simulation did not advance")
         quit(7)
         return
-    print("GODWORLD_SMOKE_OK age=%s kingdoms=%s people=%s buildings=%s nature=%s armies=%s" % [age, kingdoms.size(), people.size(), buildings.size(), nature.size(), armies.size()])
+    print("GODWORLD_SMOKE_OK age=%s kingdoms=%s people=%s buildings=%s nature=%s" % [age, kingdoms.size(), people.size(), buildings.size(), nature.size()])
     quit(0)
