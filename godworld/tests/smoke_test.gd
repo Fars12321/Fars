@@ -1,21 +1,15 @@
 extends SceneTree
 
 func _init() -> void:
-    call_deferred("_run")
-
-func _run() -> void:
     var packed:PackedScene = load("res://scenes/main.tscn") as PackedScene
     if packed == null:
         push_error("SMOKE: main scene could not be loaded")
         quit(2)
         return
     var root:Node = packed.instantiate()
-    root.process_mode = Node.PROCESS_MODE_ALWAYS
     get_root().add_child(root)
-    # Headless CI does not need real rendering frames. Advance the simulation directly
-    # so the smoke test is deterministic and cannot stall waiting for a display frame.
-    for i in range(8):
-        root.call("_simulate", 1.0)
+    for i in range(4):
+        root.call("_process", 1.1)
     var kingdoms:Array = root.get("kingdoms")
     var people:Array = root.get("people")
     var buildings:Array = root.get("buildings")
@@ -42,8 +36,5 @@ func _run() -> void:
         push_error("SMOKE: autonomous simulation did not advance")
         quit(7)
         return
-    if armies.size() == 0:
-        push_warning("SMOKE: no war emerged during short smoke window; simulation still valid")
     print("GODWORLD_SMOKE_OK age=%s kingdoms=%s people=%s buildings=%s nature=%s armies=%s" % [age, kingdoms.size(), people.size(), buildings.size(), nature.size(), armies.size()])
-    root.queue_free()
     quit(0)
