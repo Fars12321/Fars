@@ -1,0 +1,24 @@
+name: GodWorld Godot CI
+on:
+  push:
+    branches: [main, godworld-v15-auto]
+    paths:
+      - 'godworld/**'
+  pull_request:
+    paths:
+      - 'godworld/**'
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    container:
+      image: barichello/godot-ci:4.7.2
+    defaults:
+      run:
+        working-directory: godworld
+    steps:
+      - uses: actions/checkout@v4
+      - name: Import and parse project
+        run: godot --headless --path . --editor --quit
+      - name: Autonomous smoke test
+        run: godot --headless --path . --script res://tests/smoke_test.gd
